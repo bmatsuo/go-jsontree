@@ -1,32 +1,14 @@
-[install go]: http://golang.org/install.html "Install Go"
-[gopkgdoc]: http://go.pkgdoc.org/github.com/bmatsuo/jsontree/ "GoPkgDoc"
-
-About
-=============
-
-<no value>
-
-Documentation
-=============
-
-Prerequisites
--------------
-
-[Install Go][].
+[godoc.org]: http://godoc.org/github.com/bmatsuo/go-jsontree/ "godoc.org"
 
 Installation
--------------
+============
 
-    go get github.com/bmatsuo/jsontree
+    go get github.com/bmatsuo/go-jsontree
 
 General Documentation
----------------------
+=====================
 
-Use `go doc` to vew the documentation for jsontree
-
-    go doc github.com/bmatsuo/jsontree
-
-Or alternatively, check out [GoPkgDoc][]
+reed the docs on [godoc.org][]
 
 Author
 ======
