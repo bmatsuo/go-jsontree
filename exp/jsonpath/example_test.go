@@ -51,7 +51,7 @@ func Example() {
 			Key("first")),
 		Key("phone"))
 	for _, number := range bobsNumbers {
-		fmt.Println(number.Data)
+		fmt.Println(number.MustString())
 	}
 	// Output:
 	// 555-4321
