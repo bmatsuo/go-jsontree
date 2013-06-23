@@ -50,13 +50,13 @@ const (
 )
 
 var jsonTypeStrings = []string{
-	Object:  "Object",
-	Array:   "Array",
-	String:  "String",
-	Number:  "Number",
-	Boolean: "Boolean",
-	Null:    "Null",
-	Error:   "Error",
+	Object:  "object",
+	Array:   "array",
+	String:  "string",
+	Number:  "number",
+	Boolean: "boolean",
+	Null:    "null",
+	Error:   "error",
 }
 
 func (t JsonType) String() string {
@@ -244,7 +244,7 @@ func (tree *JsonTree) IsNull() bool {
 // implements json.Unmarshaler
 func (tree *JsonTree) UnmarshalJSON(p []byte) error {
 	defer tree.getType()
-	return json.Unmarshal(p, tree.val)
+	return json.Unmarshal(p, &tree.val)
 }
 
 // implements json.Marshaler
