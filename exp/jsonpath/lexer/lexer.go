@@ -49,6 +49,10 @@ func New(input string) Interface {
 }
 
 func Start(lex *lexer.Lexer) lexer.StateFn {
+	if lex.AcceptRunRange(unicode.Space) > 0 {
+		lex.Ignore()
+		return Start
+	}
 	switch lex.AcceptRun(".") {
 	case 0:
 		break
