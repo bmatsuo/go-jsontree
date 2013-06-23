@@ -80,7 +80,7 @@ type JsonTree struct {
 func newTree(val interface{}) *JsonTree {
 	return &JsonTree{
 		index: -1,
-		val: val,
+		val:   val,
 	}
 }
 
@@ -129,6 +129,17 @@ func NewArray(a []interface{}) *JsonTree {
 	tree := newTree(a)
 	tree.getType()
 	return tree
+}
+
+func (tree *JsonTree) Len() (int, error) {
+	switch tree.Type {
+	case Object:
+		return len(tree.val.(map[string]interface{})), nil
+	case Array:
+		return len(tree.val.([]interface{})), nil
+	default:
+		return 0, fmt.Errorf("not an array or an object (%v); %s", tree.Type, tree.path())
+	}
 }
 
 // any error encountered due to non-existent keys, out of range indices, etc.
