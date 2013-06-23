@@ -1,5 +1,7 @@
 [godoc.org]: http://go.pkgdoc.org/github.com/bmatsuo/go-jsontree/exp/jsonpath/ "godoc.org"
 
+an experimental package for querying jsontree structures.
+
 Install
 =======
 

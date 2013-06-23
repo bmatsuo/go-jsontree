@@ -4,7 +4,17 @@
 
 // jsonpath.go [created: Mon, 10 Jun 2013]
 
-// Package jsonpath does ....
+/*
+jsonpath is an experimental package for querying jsontree structures. it
+generally conforms with the dot-syntax of JSONPath
+
+	http://goessner.net/articles/JsonPath/
+
+Warning
+
+jsonpath is an experimental package and it's API is subject to change without
+notice.
+*/
 package jsonpath
 
 import (
