@@ -47,6 +47,7 @@ func main() {
 	onelinesep := flag.String("sep", "\t", "result separator when -oneline is given")
 	printstrings := flag.Bool("printstrings", false, "do not marshal selected strings as json")
 	mustexist := flag.Bool("mustexist", true, "exits with non-zero status if a selector has no results")
+	pretty := flag.Bool("p", false, "pretty-print output")
 	flag.Parse()
 	paths := flag.Args()
 	if len(paths) < 1 {
@@ -102,7 +103,13 @@ func main() {
 						continue
 					}
 				}
-				p, err := json.Marshal(results[i])
+				var p []byte
+				var err error
+				if *pretty {
+					p, err = json.MarshalIndent(results[i], "", "\t")
+				} else {
+					p, err = json.Marshal(results[i])
+				}
 				if err != nil {
 					fmt.Fprintln(os.Stderr, err)
 				} else {
