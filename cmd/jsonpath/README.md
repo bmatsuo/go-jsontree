@@ -1,37 +1,19 @@
-[install go]: http://golang.org/install.html "Install Go"
-[gopkgdoc]: http://go.pkgdoc.org/github.com/bmatsuo/jsonpath/ "GoPkgDoc"
+[godoc.org]: http://go.pkgdoc.org/github.com/bmatsuo/go-jsontree/cmd/jsonpath/ "godoc.org"
 
-About
-=============
+Install
+=======
 
-<no value>
+    go get github.com/bmatsuo/go-jsontree/cmd/jsonpath
 
-Documentation
-=============
+Docs
+====
 
-Prerequisites
--------------
-
-[Install Go][].
-
-Installation
--------------
-
-    go get github.com/bmatsuo/jsonpath
-
-General Documentation
----------------------
-
-Use `go doc` to vew the documentation for jsonpath
-
-    go doc github.com/bmatsuo/jsonpath
-
-Or alternatively, check out [GoPkgDoc][]
+[GoPkgDoc][]
 
 Author
 ======
 
-Bryan Matsuo &lt;bryan dot matsuo at gmail dot com&gt;
+Bryan Matsuo [bryan dot matsuo at gmail dot com]
 
 Copyright & License
 ===================

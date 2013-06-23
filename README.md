@@ -1,19 +1,19 @@
 [godoc.org]: http://godoc.org/github.com/bmatsuo/go-jsontree/ "godoc.org"
 
-Installation
-============
+Install
+=======
 
     go get github.com/bmatsuo/go-jsontree
 
-General Documentation
-=====================
+Docs
+====
 
 reed the docs on [godoc.org][]
 
 Author
 ======
 
-Bryan Matsuo &lt;bryan dot matsuo at gmail dot com&gt;
+Bryan Matsuo [bryan dot matsuo at gmail dot com]
 
 Copyright & License
 ===================
