@@ -46,6 +46,7 @@ func main() {
 	oneline := flag.Bool("oneline", false, "one line printed per input object")
 	onelinesep := flag.String("sep", "\t", "result separator when -oneline is given")
 	printstrings := flag.Bool("printstrings", false, "do not marshal selected strings as json")
+	mustexist := flag.Bool("mustexist", true, "exits with non-zero status if a selector has no results")
 	flag.Parse()
 	paths := flag.Args()
 	if len(paths)-1 < 1 {
@@ -61,6 +62,7 @@ func main() {
 		selectors[i] = sel
 	}
 	dec := json.NewDecoder(os.Stdin)
+	exitcode := 0
 	for cont := true; cont; {
 		js := new(simplejson.Json)
 		err := dec.Decode(js)
@@ -68,13 +70,19 @@ func main() {
 		case nil:
 		case io.EOF:
 			cont = false
+			continue
 		default:
 			fmt.Fprintln(os.Stderr, err)
+			exitcode = 1
 			cont = false
+			continue
 		}
 		first := true
 		for _, sel := range selectors {
 			results := jsonpath.Lookup(js, sel)
+			if len(results) == 0 && *mustexist {
+				exitcode = 1
+			}
 			for i := range results {
 				if *oneline {
 					if first {
@@ -107,4 +115,5 @@ func main() {
 			fmt.Println()
 		}
 	}
+	os.Exit(exitcode)
 }
