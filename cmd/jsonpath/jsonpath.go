@@ -13,9 +13,9 @@ objects from standard input and prints selected data to standard output.
 	"world"
 
 by default, selected strings are printed as json strings. to print the decoded
-string instead of the json representation use the -printstrings option
+string instead of the json representation use the -decodedstrings option
 
-	$ echo '{"thing":"hello"}' '{"thing":"world"}' | jsonpath -printstrings $.thing
+	$ echo '{"thing":"hello"}' '{"thing":"world"}' | jsonpath -decodedstrings $.thing
 	hello
 	world
 
@@ -24,7 +24,7 @@ on the same line (tab separated) for easier scripting.
 
 	$ echo '{"date":"2012-12-12","event":"apocalypse"}' > test.json
 	$ echo '{"date":"2012-12-13","event":"false alarm"}' >> test.json
-	$ cat test.json | jsonpath -oneline -printstrings $.date $.event
+	$ cat test.json | jsonpath -oneline -decodedstrings $.date $.event
 	2012-12-12	apocalypse
 	2012-12-13	false alarm
 */
@@ -44,15 +44,16 @@ import (
 func main() {
 	oneline := flag.Bool("oneline", false, "one line printed per input object")
 	onelinesep := flag.String("sep", "\t", "result separator when -oneline is given")
-	printstrings := flag.Bool("printstrings", false, "do not marshal selected strings as json")
+	decodedstrings := flag.Bool("decodedstrings", false, "don't json encode string results")
 	mustexist := flag.Bool("mustexist", true, "exits with non-zero status if a selector has no results")
 	pretty := flag.Bool("p", false, "pretty-print output")
 	flag.Parse()
-	paths := flag.Args()
-	if len(paths) < 1 {
+
+	if flag.NArg() < 1 {
 		fmt.Fprintf(os.Stderr, "usage: %s PATH ...\n", os.Args[0])
 		os.Exit(1)
 	}
+	paths := flag.Args()
 	selectors := make([]jsonpath.Selector, len(paths))
 	for i := range paths {
 		sel, err := jsonpath.Parse(paths[i])
@@ -62,13 +63,16 @@ func main() {
 		}
 		selectors[i] = sel
 	}
+
 	dec := json.NewDecoder(os.Stdin)
 	exitcode := 0
 	for cont := true; cont; {
+		// read a json object
 		js := new(simplejson.Json)
 		err := dec.Decode(js)
 		switch err {
 		case nil:
+			break
 		case io.EOF:
 			cont = false
 			continue
@@ -78,13 +82,18 @@ func main() {
 			cont = false
 			continue
 		}
+
+		// apply all selectors
 		first := true
 		for _, sel := range selectors {
 			results := jsonpath.Lookup(js, sel)
 			if len(results) == 0 && *mustexist {
 				exitcode = 1
+				continue
 			}
+
 			for i := range results {
+				// print separators for oneline output
 				if *oneline {
 					if first {
 						first = false
@@ -92,8 +101,11 @@ func main() {
 						fmt.Print(*onelinesep)
 					}
 				}
-				if *printstrings {
-					if str, ok := results[i].Data.(string); ok {
+
+				// print decoded strings
+				if *decodedstrings {
+					str, err := results[i].String()
+					if err == nil {
 						if *oneline {
 							fmt.Print(str)
 						} else {
@@ -102,6 +114,8 @@ func main() {
 						continue
 					}
 				}
+
+				// marshal value as json
 				var p []byte
 				var err error
 				if *pretty {
@@ -120,6 +134,7 @@ func main() {
 				}
 			}
 		}
+
 		if *oneline {
 			fmt.Println()
 		}
