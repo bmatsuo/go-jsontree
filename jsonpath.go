@@ -37,9 +37,6 @@ func Chain(path ...Selector) Selector {
 			j := 0
 			for js := range cin {
 				if js == nil {
-					if j == 0 {
-						cout <- nil
-					}
 					j++
 					break
 				}
