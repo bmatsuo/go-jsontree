@@ -8,7 +8,7 @@ Install
 Docs
 ====
 
-reed the docs on [godoc.org][]
+read the docs on [godoc.org][]
 
 Author
 ======
