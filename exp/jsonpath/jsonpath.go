@@ -120,6 +120,19 @@ func Identity(out chan<- *jsontree.JsonTree, js *jsontree.JsonTree) {
 	out <- nil
 }
 
+func Parent(out chan<- *jsontree.JsonTree, js *jsontree.JsonTree) {
+	jsparent := js.Parent()
+	if jsparent != nil {
+		out <- jsparent
+	}
+	out <- nil
+}
+
+func Root(out chan<- *jsontree.JsonTree, js *jsontree.JsonTree) {
+	out <- js.Root()
+	out <- nil
+}
+
 func All(out chan<- *jsontree.JsonTree, js *jsontree.JsonTree) {
 	if a, err := js.Array(); err == nil {
 		for i := range a {
