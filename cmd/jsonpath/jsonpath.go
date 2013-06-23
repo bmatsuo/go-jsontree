@@ -21,13 +21,13 @@ string instead of the json representation use the -printstrings option
 	world
 
 multiple paths can be selected for each object. these objects can be printed
-on the same line for easier scripting.
+on the same line (tab separated) for easier scripting.
 
 	$ echo '{"date":"2012-12-12","event":"apocalypse"}' > test.json
 	$ echo '{"date":"2012-12-13","event":"false alarm"}' >> test.json
-	$ cat test.json | jsonpath -oneline $.date $.event
-	2012-12-12	"apocalypse"
-	2012-12-12	"false alarm"
+	$ cat test.json | jsonpath -oneline -printstrings $.date $.event
+	2012-12-12	apocalypse
+	2012-12-13	false alarm
 */
 package main
 
