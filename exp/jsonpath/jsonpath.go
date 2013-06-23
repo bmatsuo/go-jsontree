@@ -73,6 +73,22 @@ func Chain(path ...Selector) Selector {
 	}
 }
 
+func Count(path ...Selector) Selector {
+	return func(out chan<- *jsontree.JsonTree, js *jsontree.JsonTree) {
+		countch := make(chan *jsontree.JsonTree)
+		count := 0
+		go Chain(path...)(countch, js)
+		for js := range countch {
+			if js == nil {
+				break
+			}
+			count++
+		}
+		// TODO create a jsontree from a number
+		out <- nil
+	}
+}
+
 func RecursiveDescent(out chan<- *jsontree.JsonTree, js *jsontree.JsonTree) {
 	recDescent(out, js)
 	out <- nil
@@ -106,6 +122,20 @@ func All(out chan<- *jsontree.JsonTree, js *jsontree.JsonTree) {
 		for k := range m {
 			out <- js.Get(k)
 		}
+	}
+	out <- nil
+}
+
+func IgnoreErrors(out chan<- *jsontree.JsonTree, js *jsontree.JsonTree) {
+	if js.Err() == nil {
+		out <- js
+	}
+	out <- nil
+}
+
+func JustErrors(out chan<- *jsontree.JsonTree, js *jsontree.JsonTree) {
+	if js.Err() != nil {
+		out <- js
 	}
 	out <- nil
 }
