@@ -10,7 +10,7 @@ Install
 Docs
 ====
 
-View the docs on [godoc.org][]
+on [godoc.org][]
 
 Author
 ======

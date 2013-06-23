@@ -8,7 +8,7 @@ Install
 Docs
 ====
 
-[GoPkgDoc][]
+on [godoc.org][]
 
 Author
 ======
