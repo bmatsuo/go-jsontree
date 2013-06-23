@@ -92,6 +92,19 @@ func (tree *JsonTree) Err() error {
 	return nil
 }
 
+// the root of tree. this value can not be nil.
+func (tree *JsonTree) Root() *JsonTree {
+	if tree.root == nil {
+		return tree
+	}
+	return tree.root
+}
+
+// tree's parent. this value can be nil
+func (tree *JsonTree) Parent() *JsonTree {
+	return tree.parent
+}
+
 // a *JsonTree representing the i-th element in the array tree. if tree.Err()
 // is not nil then the Err() method of returned *JsonTree returns the same error.
 // if tree is not an array then the Err() method of the returned *JsonTree's

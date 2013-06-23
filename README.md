@@ -1,5 +1,7 @@
 [godoc.org]: http://godoc.org/github.com/bmatsuo/go-jsontree/ "godoc.org"
 
+traverse json as a tree
+
 Install
 =======
 
