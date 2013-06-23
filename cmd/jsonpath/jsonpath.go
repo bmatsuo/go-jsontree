@@ -38,7 +38,7 @@ import (
 	"io"
 	"os"
 
-	"github.com/bmatsuo/go-jsontree/jsonpath"
+	"github.com/bmatsuo/go-jsontree/exp/jsonpath"
 	"github.com/bmatsuo/go-simplejson"
 )
 

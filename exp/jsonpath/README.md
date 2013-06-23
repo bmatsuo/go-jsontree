@@ -1,9 +1,9 @@
-[godoc.org]: http://go.pkgdoc.org/github.com/bmatsuo/go-jsontree/jsonpath/ "godoc.org"
+[godoc.org]: http://go.pkgdoc.org/github.com/bmatsuo/go-jsontree/exp/jsonpath/ "godoc.org"
 
 Install
 =======
 
-    go get github.com/bmatsuo/jsonpath
+    go get github.com/bmatsuo/go-jsontree/exp/jsonpath
 
 Docs
 ====
