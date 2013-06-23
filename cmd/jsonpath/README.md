@@ -1,5 +1,7 @@
 [godoc.org]: http://go.pkgdoc.org/github.com/bmatsuo/go-jsontree/cmd/jsonpath/ "godoc.org"
 
+a utility for processing json data.
+
 Install
 =======
 

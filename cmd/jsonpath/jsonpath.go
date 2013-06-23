@@ -5,9 +5,8 @@
 // jsonpath.go [created: Fri, 21 Jun 2013]
 
 /*
-jsonpath is a command line utility for manipulating and filtering json data.
-jsonpath reads json objects from standard input and prints selected data to
-standard output.
+jsonpath is a command line utility for processing json data. it reads json
+objects from standard input and prints selected data to standard output.
 
 	$ echo '{"thing":"hello"}' '{"thing":"world"}' | jsonpath $.thing
 	"hello"
