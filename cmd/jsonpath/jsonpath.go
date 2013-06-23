@@ -9,14 +9,14 @@ jsonpath is a command line utility for manipulating and filtering json data.
 jsonpath reads json objects from standard input and prints selected data to
 standard output.
 
-	$ echo '{"thing":"hello"}' '{"thing":"world"}' | jsonpath .thing
+	$ echo '{"thing":"hello"}' '{"thing":"world"}' | jsonpath $.thing
 	"hello"
 	"world"
 
 by default, selected strings are printed as json strings. to print the decoded
 string instead of the json representation use the -printstrings option
 
-	$ echo '{"thing":"hello"}' '{"thing":"world"}' | jsonpath -printstrings .thing
+	$ echo '{"thing":"hello"}' '{"thing":"world"}' | jsonpath -printstrings $.thing
 	hello
 	world
 
@@ -25,7 +25,7 @@ on the same line for easier scripting.
 
 	$ echo '{"date":"2012-12-12","event":"apocalypse"}' > test.json
 	$ echo '{"date":"2012-12-13","event":"false alarm"}' >> test.json
-	$ cat test.json | jsonpath -oneline .date .event
+	$ cat test.json | jsonpath -oneline $.date $.event
 	2012-12-12	"apocalypse"
 	2012-12-12	"false alarm"
 */
