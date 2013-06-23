@@ -91,7 +91,7 @@ func Count(path ...Selector) Selector {
 			}
 			count++
 		}
-		// TODO create a jsontree from a number
+		out <- jsontree.NewNumber(float64(count))
 		out <- nil
 	}
 }

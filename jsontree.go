@@ -77,11 +77,58 @@ type JsonTree struct {
 	val    interface{}
 }
 
-// creates an empty *JsonTree. initialize the tree with json.Unmarshal().
-func New() *JsonTree {
+func newTree(val interface{}) *JsonTree {
 	return &JsonTree{
 		index: -1,
+		val: val,
 	}
+}
+
+// creates an empty *JsonTree. initialize the tree with json.Unmarshal().
+func New() *JsonTree {
+	return newTree(nil)
+}
+
+func NewNull() *JsonTree {
+	tree := New()
+	tree.getType()
+	return tree
+}
+
+func NewString(s string) *JsonTree {
+	tree := newTree(s)
+	tree.getType()
+	return tree
+}
+
+func NewNumber(x float64) *JsonTree {
+	tree := newTree(x)
+	tree.getType()
+	return tree
+}
+
+func NewBoolean(b bool) *JsonTree {
+	tree := newTree(b)
+	tree.getType()
+	return tree
+}
+
+func NewObject(o map[string]interface{}) *JsonTree {
+	if o == nil {
+		o = make(map[string]interface{}, 0)
+	}
+	tree := newTree(o)
+	tree.getType()
+	return tree
+}
+
+func NewArray(a []interface{}) *JsonTree {
+	if a == nil {
+		a = make([]interface{}, 0, 1)
+	}
+	tree := newTree(a)
+	tree.getType()
+	return tree
 }
 
 // any error encountered due to non-existent keys, out of range indices, etc.
