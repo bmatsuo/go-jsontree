@@ -9,8 +9,8 @@ package jsonpath
 import (
 	"errors"
 	"fmt"
-	"unicode"
 	"os"
+	"unicode"
 
 	"github.com/bmatsuo/go-lexer"
 )
@@ -213,7 +213,19 @@ func StartBracket(lex *lexer.Lexer) lexer.StateFn {
 }
 
 func PathKey(lex *lexer.Lexer) lexer.StateFn {
-	if lex.AcceptRunRange(unicode.Letter) > 0 {
+	found := false
+	for {
+		if lex.AcceptRun("_") > 0 {
+			found = true
+			continue
+		}
+		if lex.AcceptRunRange(unicode.Letter) > 0 {
+			found = true
+			continue
+		}
+		break
+	}
+	if found {
 		debugln("FOUND PATH KEY")
 		lex.Emit(ItemPathKey)
 	}
