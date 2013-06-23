@@ -49,7 +49,6 @@ func main() {
 	mustexist := flag.Bool("mustexist", true, "exits with non-zero status if a selector has no results")
 	flag.Parse()
 	paths := flag.Args()
-	fmt.Println(len(paths))
 	if len(paths) < 1 {
 		fmt.Fprintf(os.Stderr, "usage: %s PATH ...\n", os.Args[0])
 		os.Exit(1)
@@ -96,6 +95,8 @@ func main() {
 				if *printstrings {
 					if str, ok := results[i].Data.(string); ok {
 						if *oneline {
+							fmt.Print(str)
+						} else {
 							fmt.Println(str)
 						}
 						continue
