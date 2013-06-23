@@ -18,12 +18,12 @@ notice.
 package jsonpath
 
 import (
-	"github.com/bmatsuo/go-simplejson"
+	"github.com/bmatsuo/go-jsontree"
 )
 
-func Lookup(js *simplejson.Json, path ...Selector) []*simplejson.Json {
-	var selected []*simplejson.Json
-	jschan := make(chan *simplejson.Json, 2)
+func Lookup(js *jsontree.JsonTree, path ...Selector) []*jsontree.JsonTree {
+	var selected []*jsontree.JsonTree
+	jschan := make(chan *jsontree.JsonTree, 2)
 	go Chain(path...)(jschan, js)
 	for js := range jschan {
 		if js == nil {
@@ -35,22 +35,22 @@ func Lookup(js *simplejson.Json, path ...Selector) []*simplejson.Json {
 }
 
 // Selectors MUST send nil on the channel when there are no more elements.
-type Selector func(chan<- *simplejson.Json, *simplejson.Json)
+type Selector func(chan<- *jsontree.JsonTree, *jsontree.JsonTree)
 
 func Chain(path ...Selector) Selector {
-	return func(out chan<- *simplejson.Json, js *simplejson.Json) {
-		cin := make(chan *simplejson.Json, 2)
+	return func(out chan<- *jsontree.JsonTree, js *jsontree.JsonTree) {
+		cin := make(chan *jsontree.JsonTree, 2)
 		cin <- js
 		cin <- nil
-		cout := make(chan *simplejson.Json, 2)
-		chain := func(i int, cout chan<- *simplejson.Json, cin <-chan *simplejson.Json) {
+		cout := make(chan *jsontree.JsonTree, 2)
+		chain := func(i int, cout chan<- *jsontree.JsonTree, cin <-chan *jsontree.JsonTree) {
 			j := 0
 			for js := range cin {
 				if js == nil {
 					j++
 					break
 				}
-				_cout := make(chan *simplejson.Json)
+				_cout := make(chan *jsontree.JsonTree)
 				go path[i](_cout, js)
 				for js := range _cout {
 					if js == nil {
@@ -67,24 +67,24 @@ func Chain(path ...Selector) Selector {
 			} else {
 				go chain(i, cout, cin)
 				cin = cout
-				cout = make(chan *simplejson.Json, 2)
+				cout = make(chan *jsontree.JsonTree, 2)
 			}
 		}
 	}
 }
 
-func RecursiveDescent(out chan<- *simplejson.Json, js *simplejson.Json) {
+func RecursiveDescent(out chan<- *jsontree.JsonTree, js *jsontree.JsonTree) {
 	recDescent(out, js)
 	out <- nil
 }
-func recDescent(out chan<- *simplejson.Json, js *simplejson.Json) {
+func recDescent(out chan<- *jsontree.JsonTree, js *jsontree.JsonTree) {
 	out <- js
 	if a, err := js.Array(); err == nil {
 		for i := range a {
 			elem := js.GetIndex(i)
 			recDescent(out, elem)
 		}
-	} else if m, err := js.Map(); err == nil {
+	} else if m, err := js.Object(); err == nil {
 		for k := range m {
 			val := js.Get(k)
 			recDescent(out, val)
@@ -92,17 +92,17 @@ func recDescent(out chan<- *simplejson.Json, js *simplejson.Json) {
 	}
 }
 
-func Identity(out chan<- *simplejson.Json, js *simplejson.Json) {
+func Identity(out chan<- *jsontree.JsonTree, js *jsontree.JsonTree) {
 	out <- js
 	out <- nil
 }
 
-func All(out chan<- *simplejson.Json, js *simplejson.Json) {
+func All(out chan<- *jsontree.JsonTree, js *jsontree.JsonTree) {
 	if a, err := js.Array(); err == nil {
 		for i := range a {
 			out <- js.GetIndex(i)
 		}
-	} else if m, err := js.Map(); err == nil {
+	} else if m, err := js.Object(); err == nil {
 		for k := range m {
 			out <- js.Get(k)
 		}
@@ -111,9 +111,10 @@ func All(out chan<- *simplejson.Json, js *simplejson.Json) {
 }
 
 func Key(key string) Selector {
-	return func(out chan<- *simplejson.Json, js *simplejson.Json) {
-		jschild, ok := js.CheckGet(key)
-		if ok {
+	return func(out chan<- *jsontree.JsonTree, js *jsontree.JsonTree) {
+		jschild := js.Get(key)
+		err := js.Err()
+		if err == nil {
 			out <- jschild
 		}
 		out <- nil
@@ -121,8 +122,9 @@ func Key(key string) Selector {
 }
 
 func Index(i int) Selector {
-	return func(out chan<- *simplejson.Json, js *simplejson.Json) {
-		if len(js.MustArray()) > i {
+	return func(out chan<- *jsontree.JsonTree, js *jsontree.JsonTree) {
+		a, _ := js.Array()
+		if 0 < i && i < len(a) {
 			out <- js.GetIndex(i)
 		}
 		out <- nil
@@ -130,7 +132,7 @@ func Index(i int) Selector {
 }
 
 func Has(sel ...Selector) Selector {
-	return func(out chan<- *simplejson.Json, js *simplejson.Json) {
+	return func(out chan<- *jsontree.JsonTree, js *jsontree.JsonTree) {
 		if len(Lookup(js, sel...)) > 0 {
 			out <- js
 		}
@@ -139,7 +141,7 @@ func Has(sel ...Selector) Selector {
 }
 
 func EqualString(x string, sel ...Selector) Selector {
-	return func(out chan<- *simplejson.Json, js *simplejson.Json) {
+	return func(out chan<- *jsontree.JsonTree, js *jsontree.JsonTree) {
 		for _, jschild := range Lookup(js, sel...) {
 			str, err := jschild.String()
 			if err == nil && str == x {
@@ -152,9 +154,9 @@ func EqualString(x string, sel ...Selector) Selector {
 }
 
 func EqualFloat64(x float64, sel ...Selector) Selector {
-	return func(out chan<- *simplejson.Json, js *simplejson.Json) {
+	return func(out chan<- *jsontree.JsonTree, js *jsontree.JsonTree) {
 		for _, jschild := range Lookup(js, sel...) {
-			f, err := jschild.Float64()
+			f, err := jschild.Number()
 			if err == nil && f == x {
 				out <- js
 				break
@@ -165,9 +167,9 @@ func EqualFloat64(x float64, sel ...Selector) Selector {
 }
 
 func EqualBool(x bool, sel ...Selector) Selector {
-	return func(out chan<- *simplejson.Json, js *simplejson.Json) {
+	return func(out chan<- *jsontree.JsonTree, js *jsontree.JsonTree) {
 		for _, jschild := range Lookup(js, sel...) {
-			b, err := jschild.Bool()
+			b, err := jschild.Boolean()
 			if err == nil && b == x {
 				out <- js
 				break

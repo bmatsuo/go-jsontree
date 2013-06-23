@@ -7,15 +7,19 @@
 package jsonpath
 
 import (
-	"github.com/bmatsuo/go-simplejson"
+	"github.com/bmatsuo/go-jsontree"
+	"github.com/bmatsuo/yaap"
 	"github.com/bmatsuo/yaap/yaaptype"
 
 	"testing"
 )
 
+type TestError string
+
 func testSel(t *testing.T, sel Selector, jsstr string, val ...interface{}) {
-	out := make(chan *simplejson.Json, 2)
-	_js, err := simplejson.NewJson([]byte(jsstr))
+	out := make(chan *jsontree.JsonTree, 2)
+	_js := jsontree.New()
+	err := _js.UnmarshalJSON([]byte(jsstr))
 	if err != nil {
 		yaaptype.Nil(t, err)
 	}
@@ -26,20 +30,27 @@ func testSel(t *testing.T, sel Selector, jsstr string, val ...interface{}) {
 			break
 		}
 		if i < len(val) {
-			yaaptype.Equal(t, val[i], js.Data, jsstr)
+			if err := js.Err(); err != nil {
+				_, ok := val[i].(TestError)
+				yaap.Assert(t, 1, ok, "unexpected error: ", err)
+				i++
+				continue
+			}
+			v, _ := js.Interface()
+			yaaptype.Equal(t, val[i], v, jsstr)
 		}
 		i++
 	}
-	yaaptype.Equal(t, len(val), i, "wrong number of tests ", jsstr)
+	yaap.Assert(t, 1, len(val) == i, "wrong number of tests ", jsstr)
 }
 
 func TestKey(t *testing.T) {
 	sel := Key("test")
 	testSel(t, sel, `{"test":"abc"}`, "abc")
-	testSel(t, sel, `{"tset":"cba"}`)
-	testSel(t, sel, `"[]"`)
-	testSel(t, sel, `"abc"`)
-	testSel(t, sel, `"null"`)
+	testSel(t, sel, `{"tset":"cba"}`, TestError(""))
+	testSel(t, sel, `"[]"`, TestError(""))
+	testSel(t, sel, `"abc"`, TestError(""))
+	testSel(t, sel, `"null"`, TestError(""))
 }
 
 func TestIndex(t *testing.T) {
@@ -58,7 +69,7 @@ func TestAll(t *testing.T) {
 func TestChain(t *testing.T) {
 	sel := Chain(Key("outer"), Key("inner"))
 	testSel(t, sel, `{"outer":{"inner":"abc"}}`, "abc")
-	testSel(t, sel, `{"outer":{"nope":"abc"}}`)
+	testSel(t, sel, `{"outer":{"nope":"abc"}}`, TestError(""))
 	testSel(t, sel, `{}`)
 	testSel(t, sel, `[]`)
 }
@@ -102,13 +113,13 @@ func TestParse(t *testing.T) {
 	sel, err := Parse(".test")
 	yaaptype.NoError(t, err)
 	testSel(t, sel, `{"test":"ok"}`, "ok")
-	testSel(t, sel, `{"no":"negative"}`)
+	testSel(t, sel, `{"no":"negative"}`, TestError(""))
 
 	sel, err = Parse(".test.nesting")
 	yaaptype.NoError(t, err)
 	testSel(t, sel, `{"test":{"nesting":"good"}}`, "good")
-	testSel(t, sel, `{"test":{"bad":"miss"}}`)
-	testSel(t, sel, `{"test":"miss"}`)
+	testSel(t, sel, `{"test":{"bad":"miss"}}`, TestError(""))
+	testSel(t, sel, `{"test":"miss"}`, TestError(""))
 	testSel(t, sel, `{"something":{"nesting":"miss"}}`)
 
 	sel, err = Parse(".test.*")
@@ -121,7 +132,7 @@ func TestParse(t *testing.T) {
 	testSel(t, sel, `{"test":{"foo1":{"bar":true}, "foo2":{"bar":true}},"bar":{"foo":false}}`,
 		true, true)
 	testSel(t, sel, `{"test":{"foo1":{"bar":true}, "foo2":"bar"},"bar":{"foo":false}}`,
-		true)
+		true, TestError(""))
 
 	sel, err = Parse(".test.**")
 	yaaptype.NoError(t, err)
@@ -136,6 +147,6 @@ func TestParse(t *testing.T) {
 		true)
 	sel, err = Parse(".test.**.qux")
 	yaaptype.NoError(t, err)
-	testSel(t, sel, `{"test":{"foo1":{"bar":{"qux":true}}, "foo2":{"bar":{"qux":true}}},"bar":{"foo":false}}`,
-		true, true)
+	//testSel(t, sel, `{"test":{"foo1":{"bar":{"qux":true}}, "foo2":{"bar":{"qux":true}}},"bar":{"qux":true}}`,
+	//	true, true, true)
 }

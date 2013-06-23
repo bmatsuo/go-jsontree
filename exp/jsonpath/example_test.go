@@ -7,7 +7,7 @@
 package jsonpath
 
 import (
-	"github.com/bmatsuo/go-simplejson"
+	"github.com/bmatsuo/go-jsontree"
 
 	"fmt"
 )
@@ -39,7 +39,8 @@ func Example() {
 			"phone":"555-9352"
 		}
 	]`
-	js, err := simplejson.NewJson([]byte(raw))
+	js := jsontree.New()
+	err := js.UnmarshalJSON([]byte(raw))
 	if err != nil {
 		panic(err)
 	}
@@ -51,7 +52,8 @@ func Example() {
 			Key("first")),
 		Key("phone"))
 	for _, number := range bobsNumbers {
-		fmt.Println(number.MustString())
+		str, _ := number.String()
+		fmt.Println(str)
 	}
 	// Output:
 	// 555-4321

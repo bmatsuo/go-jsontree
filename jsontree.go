@@ -173,6 +173,10 @@ func (tree *JsonTree) Get(key string) *JsonTree {
 	return child
 }
 
+func (tree *JsonTree) Interface() (interface{}, error) {
+	return tree.val, tree.Err()
+}
+
 // converts tree to a string. returns a *PathError if tree is not a string.
 func (tree *JsonTree) String() (string, error) {
 	if !tree.init {

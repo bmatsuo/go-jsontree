@@ -38,7 +38,7 @@ import (
 	"os"
 
 	"github.com/bmatsuo/go-jsontree/exp/jsonpath"
-	"github.com/bmatsuo/go-simplejson"
+	"github.com/bmatsuo/go-jsontree"
 )
 
 func main() {
@@ -68,7 +68,7 @@ func main() {
 	exitcode := 0
 	for cont := true; cont; {
 		// read a json object
-		js := new(simplejson.Json)
+		js := new(jsontree.JsonTree)
 		err := dec.Decode(js)
 		switch err {
 		case nil:
