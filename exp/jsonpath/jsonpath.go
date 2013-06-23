@@ -92,6 +92,11 @@ func recDescent(out chan<- *simplejson.Json, js *simplejson.Json) {
 	}
 }
 
+func Identity(out chan<- *simplejson.Json, js *simplejson.Json) {
+	out <- js
+	out <- nil
+}
+
 func All(out chan<- *simplejson.Json, js *simplejson.Json) {
 	if a, err := js.Array(); err == nil {
 		for i := range a {
