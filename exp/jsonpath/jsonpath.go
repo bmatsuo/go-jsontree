@@ -24,7 +24,14 @@ import (
 func Lookup(js *jsontree.JsonTree, path ...Selector) []*jsontree.JsonTree {
 	var selected []*jsontree.JsonTree
 	jschan := make(chan *jsontree.JsonTree, 2)
-	go Chain(path...)(jschan, js)
+	switch len(path) {
+	case 0:
+		return nil
+	case 1:
+		go path[0](jschan, js)
+	default:
+		go Chain(path...)(jschan, js)
+	}
 	for js := range jschan {
 		if js == nil {
 			break
