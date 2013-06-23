@@ -49,8 +49,10 @@ func main() {
 	mustexist := flag.Bool("mustexist", true, "exits with non-zero status if a selector has no results")
 	flag.Parse()
 	paths := flag.Args()
-	if len(paths)-1 < 1 {
-		fmt.Fprintf(os.Stderr, "usage: %s PATH ...", os.Args[0])
+	fmt.Println(len(paths))
+	if len(paths) < 1 {
+		fmt.Fprintf(os.Stderr, "usage: %s PATH ...\n", os.Args[0])
+		os.Exit(1)
 	}
 	selectors := make([]jsonpath.Selector, len(paths))
 	for i := range paths {
