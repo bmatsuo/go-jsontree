@@ -1,6 +1,8 @@
 package jsontree
 
-import ("testing")
+import (
+	"testing"
+)
 
 func TestJsonTree(t *testing.T) {
 }
