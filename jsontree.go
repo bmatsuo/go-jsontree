@@ -4,7 +4,7 @@
 
 // jsontree.go [created: Sat, 22 Jun 2013]
 
-// Package jsontree does ....
+// Package jsontree provides a walkable tree structure for JSON data.
 package jsontree
 
 import (
