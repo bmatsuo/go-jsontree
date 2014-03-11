@@ -1,0 +1,41 @@
+
+state 0
+	$accept: .prog $end 
+
+	:  shift 2
+	.  error
+
+	prog  goto 1
+
+state 1
+	$accept:  prog.$end 
+
+	$end  accept
+	.  error
+
+
+state 2
+	prog:  :.VAR 
+
+	VAR  shift 3
+	.  error
+
+
+state 3
+	prog:  : VAR.    (1)
+
+	.  reduce 1 (src line 72)
+
+
+7 terminals, 2 nonterminals
+2 grammar rules, 4/2000 states
+0 shift/reduce, 0 reduce/reduce conflicts reported
+51 working sets used
+memory: parser 0/30000
+0 extra closures
+2 shift entries, 1 exceptions
+1 goto entries
+0 entries saved by goto default
+Optimizer space used: output 3/30000
+3 table entries, 0 zero
+maximum spread: 7, maximum offset: 7
