@@ -67,7 +67,7 @@ func (t JsonType) String() string {
 }
 
 type JsonTree struct {
-	Type   JsonType
+	typ    JsonType
 	root   *JsonTree
 	parent *JsonTree
 	init   bool
@@ -131,8 +131,12 @@ func NewArray(a []interface{}) *JsonTree {
 	return tree
 }
 
+func (tree *JsonTree) Type() JsonType {
+	return tree.typ
+}
+
 func (tree *JsonTree) Len() (int, error) {
-	switch tree.Type {
+	switch tree.Type() {
 	case Object:
 		return len(tree.val.(map[string]interface{})), nil
 	case Array:
@@ -184,7 +188,7 @@ func (tree *JsonTree) GetIndex(i int) *JsonTree {
 	switch {
 	case !tree.init:
 		child.errUninitialized()
-	case tree.Type == Array:
+	case tree.typ == Array:
 		a := tree.val.([]interface{})
 		if 0 <= i && i < len(a) {
 			child.val = a[i]
@@ -218,7 +222,7 @@ func (tree *JsonTree) Get(key string) *JsonTree {
 	switch {
 	case !tree.init:
 		child.errUninitialized()
-	case tree.Type == Object:
+	case tree.typ == Object:
 		val, ok := tree.val.(map[string]interface{})[key]
 		if ok {
 			child.val = val
@@ -240,7 +244,7 @@ func (tree *JsonTree) String() (string, error) {
 	if !tree.init {
 		return "", newPathErrorf(tree.path(), "uninitialized")
 	}
-	switch tree.Type {
+	switch tree.typ {
 	case Error:
 		return "", *tree.err
 	case String:
@@ -255,7 +259,7 @@ func (tree *JsonTree) Number() (float64, error) {
 	if !tree.init {
 		return 0, newPathErrorf(tree.path(), "uninitialized")
 	}
-	switch tree.Type {
+	switch tree.typ {
 	case Error:
 		return 0, *tree.err
 	case Number:
@@ -270,7 +274,7 @@ func (tree *JsonTree) Boolean() (bool, error) {
 	if !tree.init {
 		return false, newPathErrorf(tree.path(), "uninitialized")
 	}
-	switch tree.Type {
+	switch tree.typ {
 	case Error:
 		return false, *tree.err
 	case Boolean:
@@ -285,7 +289,7 @@ func (tree *JsonTree) Array() ([]interface{}, error) {
 	if !tree.init {
 		return nil, newPathErrorf(tree.path(), "uninitialized")
 	}
-	switch tree.Type {
+	switch tree.typ {
 	case Error:
 		return nil, *tree.err
 	case Array:
@@ -300,7 +304,7 @@ func (tree *JsonTree) Object() (map[string]interface{}, error) {
 	if !tree.init {
 		return nil, newPathErrorf(tree.path(), "uninitialized")
 	}
-	switch tree.Type {
+	switch tree.typ {
 	case Error:
 		return nil, *tree.err
 	case Object:
@@ -313,7 +317,7 @@ func (tree *JsonTree) Object() (map[string]interface{}, error) {
 // returns true if tree is null. returns false in otherwise
 // (other type, error, non existing keys, ...).
 func (tree *JsonTree) IsNull() bool {
-	return tree.Type == Null
+	return tree.typ == Null
 }
 
 // implements json.Unmarshaler
@@ -369,21 +373,21 @@ func (tree *JsonTree) path() string {
 func (tree *JsonTree) getType() {
 	tree.init = true
 	if tree.err != nil {
-		tree.Type = Error
+		tree.typ = Error
 		return
 	}
 	switch tree.val.(type) {
 	case string:
-		tree.Type = String
+		tree.typ = String
 	case float64:
-		tree.Type = Number
+		tree.typ = Number
 	case bool:
-		tree.Type = Boolean
+		tree.typ = Boolean
 	case nil:
-		tree.Type = Null
+		tree.typ = Null
 	case []interface{}:
-		tree.Type = Array
+		tree.typ = Array
 	case map[string]interface{}:
-		tree.Type = Object
+		tree.typ = Object
 	}
 }
