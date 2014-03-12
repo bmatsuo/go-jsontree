@@ -44,7 +44,7 @@ func Example() {
 	if err != nil {
 		panic(err)
 	}
-	// *[name = bob].phone
+	// $.*[name.first = 'bob'].phone
 	bobsNumbers := Lookup(js,
 		All,
 		EqualString("bob",
